@@ -123,6 +123,19 @@ func TestDateScanNil(t *testing.T) {
 	db := connectDB(t)
 	defer db.Close()
 
+	_, err := db.Exec("INSERT INTO test_types (name, value_int) VALUES (?, ?)", "foo", "")
+	require.NoError(t, err)
+
+	var date Date
+	require.NoError(t, db.QueryRow("SELECT value_int FROM test_types WHERE name = ?", "foo").Scan(&date))
+
+	require.True(t, date.Date().IsZero())
+}
+
+func TestDateScanEmpty(t *testing.T) {
+	db := connectDB(t)
+	defer db.Close()
+
 	_, err := db.Exec("INSERT INTO test_types (name, value_int) VALUES (?, ?)", "foo", nil)
 	require.NoError(t, err)
 

@@ -49,6 +49,9 @@ func (d *Date) Scan(value interface{}) error {
 	}
 	switch value := value.(type) {
 	case string:
+		if value == "" {
+			return nil
+		}
 		read, err := civil.ParseDate(value)
 		if err != nil {
 			return fmt.Errorf("sqltypes: cannot parse %q: %w", value, err)
