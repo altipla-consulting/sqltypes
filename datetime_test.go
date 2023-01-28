@@ -80,7 +80,7 @@ func TestDateValue(t *testing.T) {
 	db := connectDB(t)
 	defer db.Close()
 
-	var date = Date(civil.Date{Year: 2018, Month: 1, Day: 2})
+	var date = NewDate(civil.Date{Year: 2018, Month: 1, Day: 2})
 	_, err := db.Exec("INSERT INTO test_types (name, value_int) VALUES (?, ?)", "foo", date)
 	require.NoError(t, err)
 
@@ -136,7 +136,7 @@ func TestDateSaveLoad(t *testing.T) {
 	db := connectDB(t)
 	defer db.Close()
 
-	var date = Date(civil.Date{Year: 2018, Month: 1, Day: 2})
+	var date = NewDate(civil.Date{Year: 2018, Month: 1, Day: 2})
 	_, err := db.Exec("INSERT INTO test_types (name, value_int) VALUES (?, ?)", "foo", date)
 	require.NoError(t, err)
 

@@ -35,7 +35,13 @@ func (t Timestamp) Time() time.Time {
 	return time.Time(t)
 }
 
-type Date civil.Date
+type Date struct {
+	val civil.Date
+}
+
+func NewDate(val civil.Date) Date {
+	return Date{val: val}
+}
 
 func (d *Date) Scan(value interface{}) error {
 	if value == nil {
@@ -47,7 +53,7 @@ func (d *Date) Scan(value interface{}) error {
 		if err != nil {
 			return fmt.Errorf("sqltypes: cannot parse %q: %w", value, err)
 		}
-		*d = Date(read)
+		*d = NewDate(read)
 		return nil
 	default:
 		return fmt.Errorf("sqltypes: unknown time type %T", value)
@@ -62,7 +68,7 @@ func (d Date) Value() (driver.Value, error) {
 }
 
 func (d Date) Date() civil.Date {
-	return civil.Date(d)
+	return civil.Date(d.val)
 }
 
 func (d Date) String() string {
