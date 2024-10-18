@@ -7,11 +7,11 @@ import (
 )
 
 type Struct[T any] struct {
-	val *T
+	V *T
 }
 
 func NewStruct[T any](val *T) Struct[T] {
-	return Struct[T]{val: val}
+	return Struct[T]{V: val}
 }
 
 func (s *Struct[T]) Scan(value interface{}) error {
@@ -38,16 +38,16 @@ func (s *Struct[T]) Scan(value interface{}) error {
 }
 
 func (s Struct[T]) Value() (driver.Value, error) {
-	if s.val == nil {
+	if s.V == nil {
 		return nil, nil
 	}
-	return json.Marshal(s.val)
+	return json.Marshal(s.V)
 }
 
 func (s *Struct[T]) Get() *T {
-	return s.val
+	return s.V
 }
 
 func (s *Struct[T]) Set(val *T) {
-	s.val = val
+	s.V = val
 }
