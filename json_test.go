@@ -15,8 +15,7 @@ func TestJSONValue(t *testing.T) {
 	db := connectDB(t)
 	defer db.Close()
 
-	var st JSON[testJSON]
-	st.V = &testJSON{Foo: "bar"}
+	st := NewJSON(&testJSON{Foo: "bar"})
 	_, err := db.Exec("INSERT INTO test_types (name, value_str) VALUES (?, ?)", "foo", st)
 	require.NoError(t, err)
 
@@ -71,8 +70,7 @@ func TestJSONSaveLoad(t *testing.T) {
 	db := connectDB(t)
 	defer db.Close()
 
-	var st JSON[testJSON]
-	st.V = &testJSON{Foo: "bar"}
+	st := NewJSON(&testJSON{Foo: "bar"})
 	_, err := db.Exec("INSERT INTO test_types (name, value_str) VALUES (?, ?)", "foo", st)
 	require.NoError(t, err)
 
@@ -83,17 +81,76 @@ func TestJSONSaveLoad(t *testing.T) {
 	require.Equal(t, st.V.Foo, "bar")
 }
 
-func TestJSONArray(t *testing.T) {
+func TestJSONArrayValue(t *testing.T) {
 	db := connectDB(t)
 	defer db.Close()
 
-	st := JSONArray[[]string]{V: []string{"foo", "bar"}}
-	_, err := db.Exec("INSERT INTO test_types (name, value_str) VALUES (?, ?)", "foo", st)
+	arr := JSONArray[int64]{1, 2, 3}
+	_, err := db.Exec("INSERT INTO test_types (name, value_str) VALUES (?, ?)", "foo", arr)
 	require.NoError(t, err)
 
-	var other JSON[[]string]
+	var val string
+	require.NoError(t, db.QueryRow("SELECT value_str FROM test_types WHERE name = ?", "foo").Scan(&val))
+
+	require.Equal(t, "[1,2,3]", val)
+}
+
+func TestJSONArrayValueNil(t *testing.T) {
+	db := connectDB(t)
+	defer db.Close()
+
+	var arr JSONArray[int64]
+	_, err := db.Exec("INSERT INTO test_types (name, value_str) VALUES (?, ?)", "foo", arr)
+	require.NoError(t, err)
+
+	var val string
+	require.NoError(t, db.QueryRow("SELECT value_str FROM test_types WHERE name = ?", "foo").Scan(&val))
+
+	require.Equal(t, "[]", val)
+}
+
+func TestJSONArrayScan(t *testing.T) {
+	db := connectDB(t)
+	defer db.Close()
+
+	_, err := db.Exec("INSERT INTO test_types (name, value_str) VALUES (?, ?)", "foo", "[1, 2, 3]")
+	require.NoError(t, err)
+
+	var arr JSONArray[int64]
+	require.NoError(t, db.QueryRow("SELECT value_str FROM test_types WHERE name = ?", "foo").Scan(&arr))
+
+	require.Len(t, arr, 3)
+	require.EqualValues(t, arr[0], 1)
+	require.EqualValues(t, arr[1], 2)
+	require.EqualValues(t, arr[2], 3)
+}
+
+func TestJSONArrayScanNil(t *testing.T) {
+	db := connectDB(t)
+	defer db.Close()
+
+	_, err := db.Exec("INSERT INTO test_types (name, value_str) VALUES (?, ?)", "foo", nil)
+	require.NoError(t, err)
+
+	var arr JSONArray[int64]
+	require.NoError(t, db.QueryRow("SELECT value_str FROM test_types WHERE name = ?", "foo").Scan(&arr))
+
+	require.Len(t, arr, 0)
+}
+
+func TestJSONArraySaveLoad(t *testing.T) {
+	db := connectDB(t)
+	defer db.Close()
+
+	arr := JSONArray[int64]{1, 2, 3}
+	_, err := db.Exec("INSERT INTO test_types (name, value_str) VALUES (?, ?)", "foo", arr)
+	require.NoError(t, err)
+
+	var other JSONArray[int64]
 	require.NoError(t, db.QueryRow("SELECT value_str FROM test_types WHERE name = ?", "foo").Scan(&other))
 
-	require.NotNil(t, st.V)
-	require.Len(t, st.V, 2)
+	require.Len(t, other, 3)
+	require.EqualValues(t, other[0], 1)
+	require.EqualValues(t, other[1], 2)
+	require.EqualValues(t, other[2], 3)
 }

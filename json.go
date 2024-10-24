@@ -48,41 +48,29 @@ func (s JSON[T]) Value() (driver.Value, error) {
 	return string(value), nil
 }
 
-type JSONArray[T any] struct {
-	V T
-}
+type JSONArray[T any] []T
 
-func NewJSONArray[T any](val *T) JSONArray[T] {
-	return JSONArray[T]{V: *val}
-}
-
-func (s *JSONArray[T]) Scan(value interface{}) error {
+func (arr *JSONArray[T]) Scan(value interface{}) error {
 	if value == nil {
 		return nil
 	}
-
-	var val T
 	switch value.(type) {
 	case []byte:
-		if err := json.Unmarshal(value.([]byte), &val); err != nil {
-			return fmt.Errorf("sqltypes: cannot unmarshal struct: %w", err)
-		}
+		return json.Unmarshal(value.([]byte), &arr)
 	case string:
-		if err := json.Unmarshal([]byte(value.(string)), &val); err != nil {
-			return fmt.Errorf("sqltypes: cannot unmarshal struct: %w", err)
-		}
+		return json.Unmarshal([]byte(value.(string)), &arr)
 	default:
 		return fmt.Errorf("sqltypes: unknown array type %T", value)
 	}
-	*s = NewJSONArray(&val)
-
-	return nil
 }
 
-func (s JSONArray[T]) Value() (driver.Value, error) {
-	value, err := json.Marshal(s.V)
-	if err != nil {
-		return nil, err
+func (arr JSONArray[T]) Value() (driver.Value, error) {
+	if arr == nil {
+		return "[]", nil
 	}
-	return string(value), nil
+	return json.Marshal(arr)
+}
+
+func (arr JSONArray[T]) Unwrap() []T {
+	return arr
 }
