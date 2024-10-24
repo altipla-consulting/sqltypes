@@ -6,7 +6,6 @@ import (
 	"fmt"
 )
 
-// Deprecated: use JSONArray instead
 type Array[T any] []T
 
 func (arr *Array[T]) Scan(value interface{}) error {
