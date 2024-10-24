@@ -14,6 +14,7 @@ func NewStruct[T any](val *T) Struct[T] {
 	return Struct[T]{V: val}
 }
 
+// Depcreated: use JSON instead
 func (s *Struct[T]) Scan(value interface{}) error {
 	if value == nil {
 		return nil
