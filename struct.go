@@ -6,6 +6,7 @@ import (
 	"fmt"
 )
 
+// Deprecated: use JSON instead
 type Struct[T any] struct {
 	V *T
 }
