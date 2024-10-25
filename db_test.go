@@ -15,9 +15,10 @@ func connectDB(t *testing.T) *sql.DB {
 	_, err = db.Exec(`
 		CREATE TABLE IF NOT EXISTS test_types (
 			name TEXT NOT NULL PRIMARY KEY,
-			value_str TEXT,
+			value_text TEXT,
+			value_blob BLOB,
 			value_int INTEGER
-		)
+		) STRICT;
 	`)
 	require.NoError(t, err)
 

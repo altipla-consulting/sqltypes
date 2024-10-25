@@ -25,7 +25,7 @@ func (arr *Array[T]) Scan(value interface{}) error {
 
 func (arr Array[T]) Value() (driver.Value, error) {
 	if arr == nil {
-		return "[]", nil
+		return []byte("[]"), nil
 	}
 	return json.Marshal(arr)
 }

@@ -43,7 +43,7 @@ func (s JSON[T]) Value() (driver.Value, error) {
 	}
 	value, err := json.Marshal(s.V)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("sqltypes: cannot marshal type: %w", err)
 	}
 	return string(value), nil
 }
@@ -68,7 +68,11 @@ func (arr JSONArray[T]) Value() (driver.Value, error) {
 	if arr == nil {
 		return "[]", nil
 	}
-	return json.Marshal(arr)
+	v, err := json.Marshal(arr)
+	if err != nil {
+		return nil, fmt.Errorf("sqltypes: cannot marshal array: %w", err)
+	}
+	return string(v), nil
 }
 
 func (arr JSONArray[T]) Unwrap() []T {
