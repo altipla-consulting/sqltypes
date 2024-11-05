@@ -58,6 +58,9 @@ func (d *Date) Scan(value interface{}) error {
 		}
 		*d = NewDate(read)
 		return nil
+	case time.Time:
+		*d = NewDate(civil.DateOf(value))
+		return nil
 	default:
 		return fmt.Errorf("sqltypes: unknown time type %T", value)
 	}
