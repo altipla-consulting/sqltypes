@@ -20,13 +20,19 @@ func (s *JSON[T]) Scan(value interface{}) error {
 	}
 
 	var val T
-	switch value.(type) {
+	switch v := value.(type) {
 	case []byte:
-		if err := json.Unmarshal(value.([]byte), &val); err != nil {
+		if len(v) == 0 {
+			return nil
+		}
+		if err := json.Unmarshal(v, &val); err != nil {
 			return fmt.Errorf("sqltypes: cannot unmarshal struct: %w", err)
 		}
 	case string:
-		if err := json.Unmarshal([]byte(value.(string)), &val); err != nil {
+		if v == "[]" {
+			return nil
+		}
+		if err := json.Unmarshal([]byte(v), &val); err != nil {
 			return fmt.Errorf("sqltypes: cannot unmarshal struct: %w", err)
 		}
 	default:
