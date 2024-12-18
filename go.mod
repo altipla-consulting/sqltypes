@@ -1,11 +1,14 @@
 module github.com/altipla-consulting/sqltypes
 
-go 1.19
+go 1.21
+
+toolchain go1.22.4
 
 require (
 	cloud.google.com/go v0.109.0
 	github.com/mattn/go-sqlite3 v1.14.16
 	github.com/stretchr/testify v1.8.1
+	google.golang.org/protobuf v1.36.0
 )
 
 require (
