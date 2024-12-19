@@ -3,6 +3,7 @@ package sqltypes
 import (
 	"database/sql/driver"
 	"fmt"
+	"reflect"
 
 	"google.golang.org/protobuf/encoding/protojson"
 	"google.golang.org/protobuf/proto"
@@ -19,6 +20,10 @@ func NewProto[M proto.Message](val M) Proto[M] {
 func (s *Proto[M]) Scan(value interface{}) error {
 	if value == nil {
 		return nil
+	}
+
+	if reflect.ValueOf(s.V).IsNil() {
+		s.V = reflect.New(reflect.TypeOf(s.V).Elem()).Interface().(M)
 	}
 
 	switch v := value.(type) {
