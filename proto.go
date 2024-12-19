@@ -21,6 +21,8 @@ func (s *Proto[M]) Scan(value interface{}) error {
 		return nil
 	}
 
+	s.V = s.V.ProtoReflect().New().Interface().(M)
+
 	switch v := value.(type) {
 	case string:
 		s.V = proto.Clone(s.V).(M)
@@ -34,6 +36,10 @@ func (s *Proto[M]) Scan(value interface{}) error {
 }
 
 func (s Proto[M]) Value() (driver.Value, error) {
+	if proto.Equal(s.V.ProtoReflect().Type().Zero().Interface().(proto.Message), s.V) {
+		return nil, nil
+	}
+
 	b, err := protojson.Marshal(s.V)
 	if err != nil {
 		return nil, err
