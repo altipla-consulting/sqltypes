@@ -23,13 +23,14 @@ func (s *Proto[M]) Scan(value interface{}) error {
 
 	s.V = s.V.ProtoReflect().New().Interface().(M)
 
+	opts := protojson.UnmarshalOptions{DiscardUnknown: true}
 	switch v := value.(type) {
 	case string:
 		s.V = proto.Clone(s.V).(M)
-		return protojson.Unmarshal([]byte(v), s.V)
+		return opts.Unmarshal([]byte(v), s.V)
 	case []byte:
 		s.V = proto.Clone(s.V).(M)
-		return protojson.Unmarshal(v, s.V)
+		return opts.Unmarshal(v, s.V)
 	}
 
 	return fmt.Errorf("unsupported protobuf column type %T", value)

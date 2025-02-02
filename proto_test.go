@@ -77,3 +77,17 @@ func TestProtoSaveLoad(t *testing.T) {
 	require.NotNil(t, st.V)
 	require.Equal(t, st.V.Name, "bar")
 }
+
+func TestProtoScanOldFields(t *testing.T) {
+	db := connectDB(t)
+	defer db.Close()
+
+	_, err := db.Exec("INSERT INTO test_types (name, value_text) VALUES (?, ?)", "foo", `{"name":"bar", "oldField": "oldValue"}`)
+	require.NoError(t, err)
+
+	var st Proto[*pb.Api]
+	require.NoError(t, db.QueryRow("SELECT value_text FROM test_types WHERE name = ?", "foo").Scan(&st))
+
+	require.NotNil(t, st.V)
+	require.Equal(t, st.V.Name, "bar")
+}
