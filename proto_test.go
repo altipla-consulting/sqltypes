@@ -91,3 +91,14 @@ func TestProtoScanOldFields(t *testing.T) {
 	require.NotNil(t, st.V)
 	require.Equal(t, st.V.Name, "bar")
 }
+
+func TestProtoBigQuery(t *testing.T) {
+	db := connectDB(t)
+	defer db.Close()
+
+	st := NewProto(&pb.Api{Name: "bar"})
+	bq, err := st.JSONValue()
+	require.NoError(t, err)
+
+	require.Equal(t, bq, `{"name":"bar"}`)
+}

@@ -47,3 +47,16 @@ func (s Proto[M]) Value() (driver.Value, error) {
 	}
 	return string(b), nil
 }
+
+func (s Proto[M]) JSONValue() (string, error) {
+	if proto.Equal(s.V.ProtoReflect().Type().Zero().Interface().(proto.Message), s.V) {
+		return "", nil
+	}
+
+	b, err := protojson.Marshal(s.V)
+	if err != nil {
+		return "", err
+	}
+
+	return string(b), nil
+}
